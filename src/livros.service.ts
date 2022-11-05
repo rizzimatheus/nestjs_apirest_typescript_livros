@@ -1,31 +1,37 @@
-import { Produto } from './livro.model';
+import { Livro } from './livro.model';
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
 
+// Define as funções utilizadas na API e com o DB para a rota '/livros'
 @Injectable()
-export class ProdutosService {
-  produtos: Produto[] = [
-    new Produto('LIV01', 'Livro TDD e BDD na prática', 20.9),
-    new Produto('LIV02', 'Livro iniciando com Flutter', 39.9),
-    new Produto('LIV03', 'Inteligência Artificial', 45.9),
-  ];
+export class LivrosService {
+  constructor(
+    @InjectModel(Livro)
+    private livroModel: typeof Livro,
+  ) {}
 
-  obterTodos(): Produto[] {
-    return this.produtos;
+  async obterTodos(): Promise<Livro[]> {
+    return this.livroModel.findAll();
   }
 
-  obterUm(id: number): Produto {
-    return this.produtos[0];
+  async obterUm(id: number): Promise<Livro> {
+    return this.livroModel.findByPk(id);
   }
 
-  criar(produto: Produto) {
-    this.produtos.push(produto);
+  async criar(livro: Livro) {
+    this.livroModel.create(livro);
   }
 
-  alterar(produto: Produto): Produto {
-    return produto;
+  async alterar(livro: Livro): Promise<[number]> {
+    return this.livroModel.update(livro, {
+      where: {
+        id: livro.id,
+      },
+    });
   }
 
-  apagar(id: number) {
-    this.produtos.pop();
+  async apagar(id: number) {
+    const livro: Livro = await this.obterUm(id);
+    livro.destroy();
   }
 }

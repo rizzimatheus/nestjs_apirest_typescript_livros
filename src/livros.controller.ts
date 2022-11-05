@@ -7,39 +7,36 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { Produto } from './livro.model';
-import { ProdutosService } from './produtos.service';
+import { Livro } from './livro.model';
+import { LivrosService } from './livros.service';
 
-// recebe como parâmetro a url '/produtos'
-@Controller('produtos')
-export class ProdutosController {
-  constructor(private produtosService: ProdutosService) {}
+// Define o comportamento da API para a rota '/livros'
+@Controller('livros')
+export class LivrosController {
+  constructor(private livrosService: LivrosService) {}
 
   @Get()
-  obterTodos(): Produto[] {
-    return this.produtosService.obterTodos();
+  async obterTodos(): Promise<Livro[]> {
+    return this.livrosService.obterTodos();
   }
 
   @Get(':id')
-  obterUm(@Param() params): Produto {
-    return this.produtosService.obterUm(params.id);
+  async obterUm(@Param() params): Promise<Livro> {
+    return this.livrosService.obterUm(params.id);
   }
 
   @Post()
-  criar(@Body() produto: Produto) {
-    produto.id = 100;
-    this.produtosService.criar(produto);
-    console.log(produto);
+  async criar(@Body() livro: Livro) {
+    await this.livrosService.criar(livro);
   }
 
   @Put()
-  alterar(@Body() produto: Produto): Produto {
-    console.log(produto);
-    return this.produtosService.alterar(produto);
+  async alterar(@Body() livro: Livro): Promise<[number]> {
+    return this.livrosService.alterar(livro);
   }
 
   @Delete(':id')
-  apagar(@Param() params) {
-    this.produtosService.apagar(params.id);
+  async apagar(@Param() params) {
+    this.livrosService.apagar(params.id);
   }
 }
